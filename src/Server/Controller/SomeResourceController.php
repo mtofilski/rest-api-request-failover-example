@@ -15,4 +15,18 @@ final class SomeResourceController extends AbstractController
         $service->execute();
         return new Response('OK');
     }
+
+    public function failEndpoint(SuperBusyService $service): Response
+    {
+        $service->execute();
+        return new Response('FAIL', 500);
+    }
+
+    public function unstableEndpoint(SuperBusyService $service): Response
+    {
+        if(random_int(0,10) === 5) {
+            return $this->failEndpoint($service);
+        }
+        return $this->successEndpoint($service);
+    }
 }

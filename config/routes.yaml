@@ -1,3 +1,9 @@
-index:
+success:
     path: /success
     controller: App\Server\Controller\SomeResourceController::successEndpoint
+fail:
+    path: /fail
+    controller: App\Server\Controller\SomeResourceController::failEndpoint
+unstable:
+    path: /unstable
+    controller: App\Server\Controller\SomeResourceController::unstableEndpoint
