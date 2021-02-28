@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Client\Cli;
 
 use App\Client\ActionService;
+use App\Client\RetryService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,11 +15,13 @@ class TriggerActionCommand extends Command
 {
     private ActionService $actionService;
     protected static $defaultName = 'action';
+    private RetryService $retryService;
 
-    public function __construct(ActionService $actionService)
+    public function __construct(ActionService $actionService, RetryService $retryService)
     {
         parent::__construct();
         $this->actionService = $actionService;
+        $this->retryService = $retryService;
     }
 
     protected function configure()
@@ -33,7 +36,10 @@ class TriggerActionCommand extends Command
                 $this->actionService->makeSomeAction($input->getArgument('actionType'))
             );
         }
-
+        foreach($this->retryService->toRetry() as $request) {
+            $output->writeln('Request to retry: ' . $request->getUri());
+            $output->writeln('Response code is: ' . $this->retryService->retry($request));
+        }
 
         $output->writeln('Looks like its the end.');
 
