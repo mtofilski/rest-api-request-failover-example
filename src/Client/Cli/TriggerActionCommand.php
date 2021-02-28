@@ -28,9 +28,12 @@ class TriggerActionCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $output->writeln('Response code is: ' .
-            $this->actionService->makeSomeAction($input->getArgument('actionType'))
-        );
+        for ($i = 0; $i < 100; $i++) {
+            $output->writeln('Response code is: ' .
+                $this->actionService->makeSomeAction($input->getArgument('actionType'))
+            );
+        }
+
 
         $output->writeln('Looks like its the end.');
 
