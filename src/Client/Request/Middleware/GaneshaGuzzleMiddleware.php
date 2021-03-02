@@ -6,6 +6,7 @@ use Ackintosh\Ganesha;
 use Ackintosh\Ganesha\Exception\RejectedException;
 use Ackintosh\Ganesha\GuzzleMiddleware\ServiceNameExtractorInterface;
 use GuzzleHttp\Promise\Create;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -46,7 +47,7 @@ class GaneshaGuzzleMiddleware
                     }
                     return Create::promiseFor($response);
                 },
-                function (ResponseInterface $response) use ($serviceName) {
+                function (NetworkExceptionInterface $response) use ($serviceName) {
                     $this->ganesha->failure($serviceName);
                     return Create::rejectionFor($response);
                 }
