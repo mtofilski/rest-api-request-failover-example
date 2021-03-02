@@ -7,7 +7,8 @@ namespace App\Client;
 
 use Ackintosh\Ganesha;
 use Ackintosh\Ganesha\Builder;
-use Ackintosh\Ganesha\GuzzleMiddleware;
+use App\Client\Request\Extractor\URIExtractor;
+use App\Client\Request\Middleware\GaneshaGuzzleMiddleware;
 use App\Client\Request\Repository\FailedRequestRepository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -36,7 +37,7 @@ final class ActionService
             ->adapter($adapter)
             ->build();
 
-        $middleware = new GuzzleMiddleware($this->ganesha);
+        $middleware = new GaneshaGuzzleMiddleware($this->ganesha, new URIExtractor());
 
         $handlers = HandlerStack::create();
         $handlers->push($middleware);
