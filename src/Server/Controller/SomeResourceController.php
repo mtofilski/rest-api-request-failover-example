@@ -28,7 +28,7 @@ final class SomeResourceController extends AbstractController
     {
         $logger->info('saving post', [(string)$request->getContent()]);
         $logger->info('saving headers', $request->headers->all());
-        if(random_int(0,10) === 5) {
+        if(random_int(3,5) === 5) {
             return $this->failEndpoint($service);
         }
         return $this->successEndpoint($service);

@@ -5,21 +5,45 @@ declare(strict_types=1);
 namespace App\Client;
 
 
+use Ackintosh\Ganesha;
+use Ackintosh\Ganesha\Builder;
+use Ackintosh\Ganesha\GuzzleMiddleware;
 use App\Client\Request\Repository\FailedRequestRepository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\HandlerStack;
+use Memcached;
 
 final class ActionService
 {
     private Client $client;
     private FailedRequestRepository $repository;
+    private Ganesha $ganesha;
 
     public function __construct(FailedRequestRepository $repository)
     {
+        $mc = new Memcached('mc');
+        $mc->addServers(array(
+            array('localhost',11211),
+        ));
+
+        $adapter = new Ganesha\Storage\Adapter\Memcached($mc);
+        $this->ganesha = Builder::withRateStrategy()
+            ->failureRateThreshold(50)
+            ->intervalToHalfOpen(10)
+            ->minimumRequests(10)
+            ->timeWindow(30)
+            ->adapter($adapter)
+            ->build();
+
+        $middleware = new GuzzleMiddleware($this->ganesha);
+
+        $handlers = HandlerStack::create();
+        $handlers->push($middleware);
         $this->client = new Client([
             'base_uri' => 'https://localhost:8000',
-            'timeout'  => 2.0,
-            'verify' => false
+            'verify' => false,
+            'handler' => $handlers
         ]);
         $this->repository = $repository;
     }
@@ -28,7 +52,6 @@ final class ActionService
     public function makeSomeAction(string $actionType): int
     {
         // do stuff
-
         try {
             $response = $this->client->post($actionType, [
                 'body' => '{"test":"OK"}'

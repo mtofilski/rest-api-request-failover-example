@@ -13,6 +13,8 @@ final class SuperBusyService
             for ($j = 0; $j < 100; $j++) {
                 $tableOfOKs[$i][$j] = 'OK';
             }
+            usleep(100);
+
         }
 
         return !empty($tableOfOKs);
