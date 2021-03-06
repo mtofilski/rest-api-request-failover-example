@@ -61,5 +61,7 @@
             "allow-contrib": false,
             "require": "5.2.*"
         }
-    }
+    },
+    "name": "mtofilski/rest-api-request-failover",
+    "description": "Package for s2s REST API connection with failure detection"
 }
