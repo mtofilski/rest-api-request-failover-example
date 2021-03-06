@@ -6,6 +6,7 @@ namespace App\Client\Cli;
 
 use App\Client\ActionService;
 use App\Client\RetryService;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,17 +32,17 @@ class TriggerActionCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        for ($i = 0; $i < 100; $i++) {
-            $output->writeln('Response code is: ' .
-                $this->actionService->makeSomeAction($input->getArgument('actionType'))
-            );
-        }
-        foreach($this->retryService->toRetry() as $request) {
-            $output->writeln('Request to retry: ' . $request->getUri());
-            $output->writeln('Response code is: ' . $this->retryService->retry($request));
+        try {
+            for ($i = 0; $i < 100; $i++) {
+                $output->writeln('Response code is: ' .
+                    $this->actionService->makeSomeAction($input->getArgument('actionType'))
+                );
+            }
+        } catch (Exception $exception) {
+            $output->writeln($exception->getMessage());
         }
 
-        $output->writeln('Looks like its the end.');
+        $output->writeln("Requests to retry: " . count($this->retryService->toRetry()));
 
         return self::SUCCESS;
     }

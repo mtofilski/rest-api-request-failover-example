@@ -10,7 +10,7 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class GaneshaGuzzleMiddleware
+class FailureDetectionMiddleware
 {
     private Ganesha $ganesha;
     private ServiceNameExtractorInterface $serviceNameExtractor;
@@ -37,19 +37,18 @@ class GaneshaGuzzleMiddleware
             }
 
             $promise = $handler($request, $options);
-
             return $promise->then(
                 function (ResponseInterface $response) use ($serviceName) {
-                    if ($response->getStatusCode() === 500) {
+                    if ($response->getStatusCode() > 500) {
                         $this->ganesha->failure($serviceName);
                     } else {
                         $this->ganesha->success($serviceName);
                     }
                     return Create::promiseFor($response);
                 },
-                function (NetworkExceptionInterface $response) use ($serviceName) {
+                function (NetworkExceptionInterface $exception) use ($serviceName) {
                     $this->ganesha->failure($serviceName);
-                    return Create::rejectionFor($response);
+                    return Create::rejectionFor($exception);
                 }
             );
         };

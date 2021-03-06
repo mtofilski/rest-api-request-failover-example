@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\Repository;
+namespace App\Client\Request\FailureDetector;
 
 use Psr\Http\Message\RequestInterface;
 
-interface FailedRequestRepository
+interface FailedRequestStorage
 {
     public function add(RequestInterface $request): void;
 

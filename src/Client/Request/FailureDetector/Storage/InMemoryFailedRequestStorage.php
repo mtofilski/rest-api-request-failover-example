@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\Repository;
+namespace App\Client\Request\FailureDetector\Storage;
 
+use App\Client\Request\FailureDetector\FailedRequestStorage;
 use Psr\Http\Message\RequestInterface;
 
-final class InMemoryFailedRequestRepository implements FailedRequestRepository
+final class InMemoryFailedRequestStorage implements FailedRequestStorage
 {
     private array $inMemoryRequests = [];
 
