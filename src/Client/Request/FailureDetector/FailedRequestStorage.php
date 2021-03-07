@@ -11,4 +11,6 @@ interface FailedRequestStorage
     public function add(RequestInterface $request): void;
 
     public function pop(): ?RequestInterface;
+
+    public function count(): int;
 }

@@ -38,10 +38,8 @@ final class Request
         $handlers->push($failureDetection);
         $handlers->push($failedRequestStorage);
 
-
-
         return new Client([
-            'base_uri' => 'https://localhost:8001',
+            'base_uri' => 'https://localhost:8000',
             'verify' => false,
             'handler' => $handlers
         ]);

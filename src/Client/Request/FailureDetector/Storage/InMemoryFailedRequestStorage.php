@@ -24,4 +24,9 @@ final class InMemoryFailedRequestStorage implements FailedRequestStorage
         }
         return array_pop($this->inMemoryRequests);
     }
+
+    public function count(): int
+    {
+        return count($this->inMemoryRequests);
+    }
 }
