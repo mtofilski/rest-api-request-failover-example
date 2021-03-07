@@ -29,3 +29,13 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    adapter.memcached:
+        class: Memcached
+        arguments:
+        calls:
+            - [ addServer, [ localhost, 11211 ] ]
+
+    App\Client\Request\FailureDetector\GaneshaFailureDetector:
+        arguments:
+            - '@adapter.memcached'

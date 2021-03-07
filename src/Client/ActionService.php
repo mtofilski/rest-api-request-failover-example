@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Client;
 
-use App\Client\Request\Request;
+use App\Client\Request\FailureHandlers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -13,9 +13,13 @@ final class ActionService
 {
     private Client $client;
 
-    public function __construct( Request  $request)
+    public function __construct(FailureHandlers $request)
     {
-        $this->client = $request->getClient();
+        $this->client = new Client([
+            'base_uri' => 'https://localhost:8000',
+            'verify'   => false,
+            'handler'  => $request->getHandlers()
+        ]);
     }
 
 
