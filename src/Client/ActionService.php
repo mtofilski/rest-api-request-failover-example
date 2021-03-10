@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace App\Client;
 
-use App\Client\Request\FailureHandlers;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
+use Exception;
+use GuzzleHttp\ClientInterface;
 
 final class ActionService
 {
-    private Client $client;
+    private ClientInterface $client;
 
-    public function __construct(FailureHandlers $request)
+    public function __construct(ClientInterface $client)
     {
-        $this->client = new Client([
-            'base_uri' => 'https://localhost:8000',
-            'verify'   => false,
-            'handler'  => $request->getHandlers()
-        ]);
+        $this->client = $client;
     }
 
 
@@ -27,10 +21,10 @@ final class ActionService
     {
         // do stuff
         try {
-            $response = $this->client->post($actionType, [
+            $response = $this->client->request('POST', $actionType, [
                 'body' => '{"test":"OK"}'
             ]);
-        } catch (RequestException | ConnectException $e) {
+        } catch (Exception $e) {
             return $e->getCode();
         }
         return $response->getStatusCode();

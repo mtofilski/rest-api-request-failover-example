@@ -2,18 +2,18 @@
 
 namespace App\Client\Request\Middleware;
 
-use App\Client\Request\FailureDetector\FailedRequestStorage;
+use App\Client\Request\Storage\RetryStorage;
 use GuzzleHttp\Promise\Create;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class FailedRequestStorageMiddleware
+class RetryStorageMiddleware
 {
-    private FailedRequestStorage $storage;
+    private RetryStorage $storage;
 
     public function __construct(
-        FailedRequestStorage $storage
+        RetryStorage $storage
     ) {
         $this->storage = $storage;
     }
@@ -24,7 +24,7 @@ class FailedRequestStorageMiddleware
             $promise = $handler($request, $options);
             return $promise->then(
                 function (ResponseInterface $response) use ($request) {
-                    if ($response->getStatusCode() === 500) {
+                    if ($response->getStatusCode() >= 400) {
                         $this->storage->add($request);
                     }
                     return Create::promiseFor($response);

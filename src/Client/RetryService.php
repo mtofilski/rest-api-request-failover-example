@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Client;
 
-use App\Client\Request\FailureDetector\FailedRequestStorage;
+use App\Client\Request\Storage\RetryStorage;
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
 
 final class RetryService
 {
-    private FailedRequestStorage $repository;
+    private RetryStorage $repository;
     private Client $client;
 
-    public function __construct(FailedRequestStorage $repository)
+    public function __construct(RetryStorage $repository)
     {
         $this->repository = $repository;
         $this->client = new Client([

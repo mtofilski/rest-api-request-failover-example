@@ -39,7 +39,7 @@ class FailureDetectionMiddleware
             $promise = $handler($request, $options);
             return $promise->then(
                 function (ResponseInterface $response) use ($serviceName) {
-                    if ($response->getStatusCode() > 500) {
+                    if ($response->getStatusCode() >= 400) {
                         $this->ganesha->failure($serviceName);
                     } else {
                         $this->ganesha->success($serviceName);

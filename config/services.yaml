@@ -36,6 +36,25 @@ services:
         calls:
             - [ addServer, [ localhost, 11211 ] ]
 
+    client.local:
+        class: GuzzleHttp\Client
+        arguments:
+            - {
+                  base_uri: 'https://localhost:8000',
+                  verify: false
+                  handlers:
+                      - '@FailureDetectionMiddleware'
+                      - '@App\Client\Request\Middleware\RetryStorageMiddleware'
+
+            }
+    App\Client\Request\Middleware\RetryStorageMiddleware: ~
+    App\Client\Request\Middleware\FailureDetectionMiddleware:
+
+
     App\Client\Request\FailureDetector\GaneshaFailureDetector:
         arguments:
             - '@adapter.memcached'
+
+    App\Client\ActionService:
+        arguments:
+            - '@client.local'
