@@ -8,6 +8,7 @@ namespace App\Tests\Client;
 use App\Client\ActionService;
 use App\Client\Request\Factory\InternalClient;
 use App\Client\Request\FailureDetector\Storage\InMemoryRetryStorage;
+use App\Client\Request\Middlewares;
 use App\Tests\ExecutionTrait;
 use App\Tests\Fixtures\MiddlewareFixtures;
 use PHPUnit\Framework\TestCase;
@@ -19,9 +20,10 @@ final class ActionServiceTest extends TestCase
     public function testShouldTriggerFailureDetection(): void
     {
         $storage = new InMemoryRetryStorage();
-        $client = new InternalClient(
-            MiddlewareFixtures::aFailureDetectionMiddleware(),
-            MiddlewareFixtures::aRetryStorageMiddleware($storage)
+        $client = new InternalClient(new Middlewares(
+                MiddlewareFixtures::aFailureDetectionMiddleware(),
+                MiddlewareFixtures::aRetryStorageMiddleware($storage)
+            )
         );
         $service = new ActionService($client->__invoke());
 
@@ -35,9 +37,10 @@ final class ActionServiceTest extends TestCase
     public function testShouldPassWithoutErrors(): void
     {
         $storage = new InMemoryRetryStorage();
-        $client = new InternalClient(
-            MiddlewareFixtures::aFailureDetectionMiddleware(),
-            MiddlewareFixtures::aRetryStorageMiddleware($storage)
+        $client = new InternalClient(new Middlewares(
+                MiddlewareFixtures::aFailureDetectionMiddleware(),
+                MiddlewareFixtures::aRetryStorageMiddleware($storage)
+            )
         );
         $service = new ActionService($client->__invoke());
 
