@@ -53,10 +53,16 @@ services:
 
     App\Client\Request\Middleware\RetryStorageMiddleware: ~
 
-    App\Client\Request\Factory\InternalClient:
+    client.middleware:
+        class: App\Client\Request\Middlewares
         arguments:
             - '@App\Client\Request\Middleware\FailureDetectionMiddleware'
             - '@App\Client\Request\Middleware\RetryStorageMiddleware'
+
+
+    App\Client\Request\Factory\InternalClient:
+        arguments:
+            - '@client.middleware'
 
     client.local:
         class: GuzzleHttp\Client
