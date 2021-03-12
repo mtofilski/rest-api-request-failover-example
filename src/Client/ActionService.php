@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Client;
 
-use Exception;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 
 final class ActionService
 {
@@ -24,7 +24,7 @@ final class ActionService
             $response = $this->client->request('POST', $actionType, [
                 'body' => '{"test":"OK"}'
             ]);
-        } catch (Exception $e) {
+        } catch (GuzzleException $e) {
             return $e->getCode();
         }
         return $response->getStatusCode();

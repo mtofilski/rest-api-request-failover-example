@@ -30,30 +30,38 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    adapter.memcached:
+    cache.memcached:
         class: Memcached
         arguments:
         calls:
             - [ addServer, [ localhost, 11211 ] ]
 
+    ganesha.adapter:
+        class: Ackintosh\Ganesha\Storage\Adapter\Memcached
+        arguments:
+            - '@cache.memcached'
+    Ackintosh\Ganesha\Storage\AdapterInterface: '@ganesha.adapter'
+
+    ganesha.detector:
+        class: Ackintosh\Ganesha
+        factory: '@App\Client\Request\FailureDetector\GaneshaFailureDetector'
+
+    App\Client\Request\Middleware\FailureDetectionMiddleware:
+        arguments:
+            - '@ganesha.detector'
+            - '@App\Client\Request\Extractor\URIExtractor'
+
+    App\Client\Request\Middleware\RetryStorageMiddleware: ~
+
+    App\Client\Request\Factory\InternalClient:
+        arguments:
+            - '@App\Client\Request\Middleware\FailureDetectionMiddleware'
+            - '@App\Client\Request\Middleware\RetryStorageMiddleware'
+
     client.local:
         class: GuzzleHttp\Client
-        arguments:
-            - {
-                  base_uri: 'https://localhost:8000',
-                  verify: false
-                  handlers:
-                      - '@FailureDetectionMiddleware'
-                      - '@App\Client\Request\Middleware\RetryStorageMiddleware'
+        factory: '@App\Client\Request\Factory\InternalClient'
 
-            }
-    App\Client\Request\Middleware\RetryStorageMiddleware: ~
-    App\Client\Request\Middleware\FailureDetectionMiddleware:
-
-
-    App\Client\Request\FailureDetector\GaneshaFailureDetector:
-        arguments:
-            - '@adapter.memcached'
 
     App\Client\ActionService:
         arguments:

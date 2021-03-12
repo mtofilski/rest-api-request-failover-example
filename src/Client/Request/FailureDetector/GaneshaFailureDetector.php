@@ -18,7 +18,7 @@ final class GaneshaFailureDetector
     }
 
 
-    public function loadStrategy(): Ganesha
+    public function __invoke(): Ganesha
     {
         return Builder::withRateStrategy()
             ->failureRateThreshold(50)

@@ -6,12 +6,10 @@ namespace App\Tests\Client;
 
 
 use App\Client\ActionService;
-use App\Client\Request\FailureDetector\GaneshaFailureDetector;
+use App\Client\Request\Factory\InternalClient;
 use App\Client\Request\FailureDetector\Storage\InMemoryRetryStorage;
-use App\Client\Request\FailureHandlers;
 use App\Tests\ExecutionTrait;
-use GuzzleHttp\Client;
-use Memcached;
+use App\Tests\Fixtures\MiddlewareFixtures;
 use PHPUnit\Framework\TestCase;
 
 final class ActionServiceTest extends TestCase
@@ -20,19 +18,12 @@ final class ActionServiceTest extends TestCase
 
     public function testShouldTriggerFailureDetection(): void
     {
-        $mc = new Memcached('mc');
-        $mc->addServers(array(
-            array('localhost',11211),
-        ));
         $storage = new InMemoryRetryStorage();
-        $failureDetection = new GaneshaFailureDetector(new \Ackintosh\Ganesha\Storage\Adapter\Memcached($mc));
-        $request = new FailureHandlers($storage, $failureDetection);
-        $client = new Client([
-            'base_uri' => 'https://localhost:8000',
-            'verify'   => false,
-            'handler'  => $request->getHandlers()
-        ]);
-        $service = new ActionService($client);
+        $client = new InternalClient(
+            MiddlewareFixtures::aFailureDetectionMiddleware(),
+            MiddlewareFixtures::aRetryStorageMiddleware($storage)
+        );
+        $service = new ActionService($client->__invoke());
 
         $this->executeTimes(10, function() use ($service) {
             $service->makeSomeAction('fail');
@@ -43,19 +34,12 @@ final class ActionServiceTest extends TestCase
 
     public function testShouldPassWithoutErrors(): void
     {
-        $mc = new Memcached('mc');
-        $mc->addServers(array(
-            array('localhost',11211),
-        ));
         $storage = new InMemoryRetryStorage();
-        $failureDetection = new GaneshaFailureDetector(new \Ackintosh\Ganesha\Storage\Adapter\Memcached($mc));
-        $request = new FailureHandlers($storage, $failureDetection);
-        $client = new Client([
-            'base_uri' => 'https://localhost:8000',
-            'verify'   => false,
-            'handler'  => $request->getHandlers()
-        ]);
-        $service = new ActionService($client);
+        $client = new InternalClient(
+            MiddlewareFixtures::aFailureDetectionMiddleware(),
+            MiddlewareFixtures::aRetryStorageMiddleware($storage)
+        );
+        $service = new ActionService($client->__invoke());
 
         $this->executeTimes(10, function() use ($service) {
             $service->makeSomeAction('success');

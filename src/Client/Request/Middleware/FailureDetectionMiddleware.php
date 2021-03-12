@@ -5,12 +5,13 @@ namespace App\Client\Request\Middleware;
 use Ackintosh\Ganesha;
 use Ackintosh\Ganesha\Exception\RejectedException;
 use Ackintosh\Ganesha\GuzzleMiddleware\ServiceNameExtractorInterface;
+use App\Client\Request\Middleware;
 use GuzzleHttp\Promise\Create;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class FailureDetectionMiddleware
+class FailureDetectionMiddleware implements Middleware
 {
     private Ganesha $ganesha;
     private ServiceNameExtractorInterface $serviceNameExtractor;
@@ -36,8 +37,7 @@ class FailureDetectionMiddleware
                 );
             }
 
-            $promise = $handler($request, $options);
-            return $promise->then(
+            return $handler($request, $options)->then(
                 function (ResponseInterface $response) use ($serviceName) {
                     if ($response->getStatusCode() >= 400) {
                         $this->ganesha->failure($serviceName);
