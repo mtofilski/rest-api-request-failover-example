@@ -21,7 +21,7 @@ final class InMemoryFailedTransport implements FailedTransport
         if(empty($this->inMemoryRequests)) {
             return null;
         }
-        return array_pop($this->inMemoryRequests);
+        return array_shift($this->inMemoryRequests);
     }
 
     public function count(): int
