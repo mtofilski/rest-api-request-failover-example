@@ -6,9 +6,9 @@ namespace App\Client\Request\Storage;
 
 use Psr\Http\Message\RequestInterface;
 
-interface RetryStorage
+interface FailedTransport
 {
-    public function add(RequestInterface $request): void;
+    public function store(RequestInterface $request): void;
 
     public function pop(): ?RequestInterface;
 

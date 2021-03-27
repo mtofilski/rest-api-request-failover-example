@@ -40,35 +40,14 @@ services:
         class: Ackintosh\Ganesha\Storage\Adapter\Memcached
         arguments:
             - '@cache.memcached'
-    Ackintosh\Ganesha\Storage\AdapterInterface: '@ganesha.adapter'
 
-    ganesha.detector:
-        class: Ackintosh\Ganesha
-        factory: '@App\Client\Request\FailureDetector\GaneshaFailureDetector'
+    App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport:
 
-    App\Client\Request\Middleware\FailureDetectionMiddleware:
+    GuzzleHttp\ClientInterface:
+        factory: '@http.client.internal'
+
+    http.client.internal:
+        class: App\Client\Request\Factory\InternalClient
         arguments:
-            - '@ganesha.detector'
-            - '@App\Client\Request\Extractor\URIExtractor'
-
-    App\Client\Request\Middleware\RetryStorageMiddleware: ~
-
-    client.middleware:
-        class: App\Client\Request\Middlewares
-        arguments:
-            - '@App\Client\Request\Middleware\FailureDetectionMiddleware'
-            - '@App\Client\Request\Middleware\RetryStorageMiddleware'
-
-
-    App\Client\Request\Factory\InternalClient:
-        arguments:
-            - '@client.middleware'
-
-    client.local:
-        class: GuzzleHttp\Client
-        factory: '@App\Client\Request\Factory\InternalClient'
-
-
-    App\Client\ActionService:
-        arguments:
-            - '@client.local'
+            - '@App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport'
+            - '@ganesha.adapter'

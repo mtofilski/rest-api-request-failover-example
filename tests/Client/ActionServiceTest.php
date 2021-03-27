@@ -6,48 +6,102 @@ namespace App\Tests\Client;
 
 
 use App\Client\ActionService;
-use App\Client\Request\Factory\InternalClient;
-use App\Client\Request\FailureDetector\Storage\InMemoryRetryStorage;
-use App\Client\Request\Middlewares;
+use App\Client\Infrastructure\HttpActionRequest;
+use App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport;
 use App\Tests\ExecutionTrait;
-use App\Tests\Fixtures\MiddlewareFixtures;
+use App\Tests\Fixtures\ClientFixture;
 use PHPUnit\Framework\TestCase;
+
+use function extension_loaded;
 
 final class ActionServiceTest extends TestCase
 {
     use ExecutionTrait;
 
+    protected function setUp(): void
+    {
+        if (!extension_loaded('memcached')) {
+            self::markTestSkipped('ext-memcached not found.');
+        }
+    }
+
     public function testShouldTriggerFailureDetection(): void
     {
-        $storage = new InMemoryRetryStorage();
-        $client = new InternalClient(new Middlewares(
-                MiddlewareFixtures::aFailureDetectionMiddleware(),
-                MiddlewareFixtures::aRetryStorageMiddleware($storage)
-            )
-        );
-        $service = new ActionService($client->__invoke());
+        $storage = new InMemoryFailedTransport();
+        $requestAdapter = new HttpActionRequest(ClientFixture::guzzleClient($storage));
+        $service = new ActionService($requestAdapter);
 
-        $this->executeTimes(10, function() use ($service) {
-            $service->makeSomeAction('fail');
-        });
+        $this->executeTimes(
+            10,
+            function () use ($service) {
+                $service->makeSomeAction('fail');
+            }
+        );
 
         self::assertEquals(10, $storage->count());
     }
 
     public function testShouldPassWithoutErrors(): void
     {
-        $storage = new InMemoryRetryStorage();
-        $client = new InternalClient(new Middlewares(
-                MiddlewareFixtures::aFailureDetectionMiddleware(),
-                MiddlewareFixtures::aRetryStorageMiddleware($storage)
-            )
-        );
-        $service = new ActionService($client->__invoke());
+        $storage = new InMemoryFailedTransport();
+        $requestAdapter = new HttpActionRequest(ClientFixture::guzzleClient($storage));
+        $service = new ActionService($requestAdapter);
 
-        $this->executeTimes(10, function() use ($service) {
-            $service->makeSomeAction('success');
-        });
+        $this->executeTimes(
+            10,
+            function () use ($service) {
+                $service->makeSomeAction('success');
+            }
+        );
 
         self::assertEquals(0, $storage->count());
+    }
+
+    public function testShouldTriggerFailureDetectionWhenUnverifiedCert(): void
+    {
+        $storage = new InMemoryFailedTransport();
+        $requestAdapter = new HttpActionRequest(ClientFixture::unverifiedClient($storage));
+        $service = new ActionService($requestAdapter);
+
+        $this->executeTimes(
+            10,
+            function () use ($service) {
+                $service->makeSomeAction('success');
+            }
+        );
+
+        self::assertEquals(10, $storage->count());
+    }
+
+    public function testShouldTriggerFailureDetectionWhenRequestWrongRoute(): void
+    {
+        $storage = new InMemoryFailedTransport();
+        $requestAdapter = new HttpActionRequest(ClientFixture::unverifiedClient($storage));
+        $service = new ActionService($requestAdapter);
+
+        $this->executeTimes(
+            10,
+            function () use ($service) {
+                $service->makeSomeAction('unknown');
+            }
+        );
+
+        self::assertEquals(10, $storage->count());
+    }
+
+    public function testShouldTriggerFailureDetectionWhenRequestWrongHost(): void
+    {
+        $storage = new InMemoryFailedTransport();
+        $requestAdapter = new HttpActionRequest(ClientFixture::wrongHostClient($storage));
+        $service = new ActionService($requestAdapter);
+
+        $this->executeTimes(
+            3,
+            function () use ($service) {
+                $service->makeSomeAction('success');
+            }
+        );
+
+        self::assertEquals(3, $storage->count());
     }
 }

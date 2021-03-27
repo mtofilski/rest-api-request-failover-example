@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Client\Request\FailureDetector\Storage;
 
-use App\Client\Request\Storage\RetryStorage;
+use App\Client\Request\Storage\FailedTransport;
 use Psr\Http\Message\RequestInterface;
 
-final class InMemoryRetryStorage implements RetryStorage
+final class InMemoryFailedTransport implements FailedTransport
 {
     private array $inMemoryRequests = [];
 
 
-    public function add(RequestInterface $request): void
+    public function store(RequestInterface $request): void
     {
         $this->inMemoryRequests[] = $request;
     }

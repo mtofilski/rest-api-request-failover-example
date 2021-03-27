@@ -25,7 +25,7 @@ class TriggerActionCommand extends Command
         $this->retryService = $retryService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('actionType', InputArgument::REQUIRED);
     }
@@ -34,7 +34,8 @@ class TriggerActionCommand extends Command
     {
         try {
             for ($i = 0; $i < 100; $i++) {
-                $output->writeln('Response code is: ' .
+                $output->writeln(
+                    'Response code is: ' .
                     $this->actionService->makeSomeAction($input->getArgument('actionType'))
                 );
             }
