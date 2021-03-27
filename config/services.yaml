@@ -44,10 +44,10 @@ services:
     App\CircuitBreaker\Transport\InMemoryFailedTransport:
 
     GuzzleHttp\ClientInterface:
-        factory: '@http.client.internal'
+        factory: '@http.client.concrete'
 
-    http.client.internal:
-        class: App\Client\Request\Factory\InternalClient
+    http.client.concrete:
+        class: App\Client\Request\Factory\ConcreteClient
         arguments:
             - '@App\CircuitBreaker\Transport\InMemoryFailedTransport'
             - '@ganesha.adapter'

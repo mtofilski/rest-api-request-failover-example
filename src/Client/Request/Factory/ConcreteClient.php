@@ -12,7 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 
-final class InternalClient
+final class ConcreteClient
 {
     private FailedTransport $transport;
     private AdapterInterface $adapter;
