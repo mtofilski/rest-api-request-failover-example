@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Client;
 
 
+use App\CircuitBreaker\Transport\InMemoryFailedTransport;
 use App\Client\ActionService;
 use App\Client\Infrastructure\HttpActionRequest;
-use App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport;
+use App\Tests\Client\Fixtures\ClientFixture;
 use App\Tests\ExecutionTrait;
-use App\Tests\Fixtures\ClientFixture;
 use PHPUnit\Framework\TestCase;
 
 use function extension_loaded;
@@ -96,12 +96,12 @@ final class ActionServiceTest extends TestCase
         $service = new ActionService($requestAdapter);
 
         $this->executeTimes(
-            3,
+            10,
             function () use ($service) {
                 $service->makeSomeAction('success');
             }
         );
 
-        self::assertEquals(3, $storage->count());
+        self::assertEquals(10, $storage->count());
     }
 }

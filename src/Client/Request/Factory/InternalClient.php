@@ -6,7 +6,8 @@ namespace App\Client\Request\Factory;
 
 use Ackintosh\Ganesha\Builder;
 use Ackintosh\Ganesha\Storage\AdapterInterface;
-use App\Client\Request\Storage\FailedTransport;
+use App\CircuitBreaker\CircuitBreakerMiddleware;
+use App\CircuitBreaker\Transport\FailedTransport;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;

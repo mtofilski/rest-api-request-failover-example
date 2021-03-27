@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\FailureDetector\Storage;
+namespace App\CircuitBreaker\Transport;
 
-use App\Client\Request\Storage\FailedTransport;
 use Psr\Http\Message\RequestInterface;
 
 final class InMemoryFailedTransport implements FailedTransport

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\Storage;
+namespace App\CircuitBreaker\Transport;
 
 use Psr\Http\Message\RequestInterface;
 

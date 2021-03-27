@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Fixtures;
+namespace App\Tests\Client\Fixtures;
 
-use App\Client\Request\Storage\FailedTransport;
+use App\CircuitBreaker\Transport\FailedTransport;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
@@ -38,6 +38,7 @@ final class ClientFixture
         return new Client(
             [
                 'base_uri' => 'https://localhost:8001',
+                'timeout'  => 2.0,
                 'verify'   => false,
                 'handler'  => self::loadHandleStack($transport)
             ]

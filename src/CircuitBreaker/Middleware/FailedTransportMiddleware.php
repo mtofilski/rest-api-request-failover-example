@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Client\Request\Middleware;
+namespace App\CircuitBreaker\Middleware;
 
-use App\Client\Request\Storage\FailedTransport;
+use App\CircuitBreaker\Transport\FailedTransport;
 use Closure;
 use GuzzleHttp\Promise\Create;
 use Psr\Http\Message\RequestInterface;

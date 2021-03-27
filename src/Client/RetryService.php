@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Client;
 
-use App\Client\Request\Storage\FailedTransport;
+use App\CircuitBreaker\Transport\FailedTransport;
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Client\Request\Middleware;
+namespace App\CircuitBreaker\Middleware;
 
 use Ackintosh\Ganesha;
 use Ackintosh\Ganesha\Exception\RejectedException;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\Extractor;
+namespace App\CircuitBreaker\Extractor;
 
 use Ackintosh\Ganesha\GuzzleMiddleware\ServiceNameExtractorInterface;
 use Psr\Http\Message\RequestInterface;

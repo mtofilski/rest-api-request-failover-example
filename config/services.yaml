@@ -41,7 +41,7 @@ services:
         arguments:
             - '@cache.memcached'
 
-    App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport:
+    App\CircuitBreaker\Transport\InMemoryFailedTransport:
 
     GuzzleHttp\ClientInterface:
         factory: '@http.client.internal'
@@ -49,5 +49,5 @@ services:
     http.client.internal:
         class: App\Client\Request\Factory\InternalClient
         arguments:
-            - '@App\Client\Request\FailureDetector\Storage\InMemoryFailedTransport'
+            - '@App\CircuitBreaker\Transport\InMemoryFailedTransport'
             - '@ganesha.adapter'

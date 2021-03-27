@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Client\Request\Factory;
+namespace App\CircuitBreaker;
 
 
 use Ackintosh\Ganesha;
 use Ackintosh\Ganesha\GuzzleMiddleware\ServiceNameExtractorInterface;
-use App\Client\Request\Extractor\URIExtractor;
-use App\Client\Request\Middleware\FailedTransportMiddleware;
-use App\Client\Request\Middleware\FailureDetectionMiddleware;
-use App\Client\Request\Storage\FailedTransport;
+use App\CircuitBreaker\Extractor\URIExtractor;
+use App\CircuitBreaker\Middleware\FailedTransportMiddleware;
+use App\CircuitBreaker\Middleware\FailureDetectionMiddleware;
+use App\CircuitBreaker\Transport\FailedTransport;
 
 final class CircuitBreakerMiddleware
 {
