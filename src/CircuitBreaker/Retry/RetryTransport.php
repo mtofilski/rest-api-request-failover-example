@@ -21,39 +21,22 @@ final class RetryTransport
         $this->client = $client;
     }
 
-    public function retry(): bool
+    public function retry(): RetryReport
     {
         $requestsToTransport = $this->failedTransport->count();
-        try {
-            for ($i = 0; $i < $requestsToTransport; $i++) {
-                $request = $this->failedTransport->pop();
-                if ($request) {
-                    $currentRetryCounter = 1 + (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER);
-                    $this->client->send($request->withHeader(FailedTransport::RETRY_HEADER, $currentRetryCounter));
+        $report = new RetryReport($requestsToTransport);
+        for ($i = 0; $i < $requestsToTransport; $i++) {
+            $request = $this->failedTransport->pop();
+            if ($request) {
+                $currentRetryCounter = 1 + (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER);
+                try {
+                    $response = $this->client->send($request->withHeader(FailedTransport::RETRY_HEADER, $currentRetryCounter));
+                    $report->saveCode($response->getStatusCode());
+                } catch (GuzzleException | RejectedException $e) {
+                    $report->saveError($request, $e);
                 }
             }
-        } catch (GuzzleException | RejectedException $e) {
-            return false;
         }
-        return true;
-    }
-
-    public function retryForce(): bool
-    {
-        $requestsToTransport = $this->failedTransport->count();
-
-            for ($i = 0; $i < $requestsToTransport; $i++) {
-                $request = $this->failedTransport->pop();
-                if ($request) {
-                    $currentRetryCounter = 1 + (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER);
-                    try {
-                        $this->client->send($request->withHeader(FailedTransport::RETRY_HEADER, $currentRetryCounter));
-                    } catch (GuzzleException | RejectedException $e) {
-                        continue;
-                    }
-                }
-            }
-
-        return true;
+        return $report;
     }
 }

@@ -37,6 +37,17 @@ final class RetryTransportTest extends TestCase
         self::assertEquals(0, $storage->count());
     }
 
+    public function testShouldNotTransportAnyMessageWhenNothingIsInTheStore(): void
+    {
+        $storage = new InMemoryFailedTransport();
+
+        $retryService = new RetryTransport(ClientFixture::guzzleClient($storage), $storage);
+        $retryService->retry();
+
+        self::assertEquals(0, $storage->count());
+        self::assertNull($storage->pop());
+    }
+
     public function testShouldTransportAllMessagesAndStoreAgain(): void
     {
         $storage = new InMemoryFailedTransport();
@@ -128,7 +139,7 @@ final class RetryTransportTest extends TestCase
         $this->executeTimes(
             2,
             function () use ($retryService) {
-                $retryService->retryForce();
+                $retryService->retry();
             }
         );
 
