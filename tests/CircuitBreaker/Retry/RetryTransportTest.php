@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\CircuitBreaker\Retry;
 
 use App\CircuitBreaker\Retry\RetryTransport;
+use App\CircuitBreaker\Transport\FailedTransport;
 use App\CircuitBreaker\Transport\InMemoryFailedTransport;
 use App\Tests\Client\Fixtures\ClientFixture;
 use App\Tests\ExecutionTrait;
@@ -77,7 +78,7 @@ final class RetryTransportTest extends TestCase
 
         $request = $storage->pop();
         self::assertEquals(0, $storage->count());
-        self::assertEquals(1, (int)$request->getHeaderLine('x-retry'));
+        self::assertEquals(1, (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER));
     }
 
     public function testShouldTransportAllMessagesAndStoreAgainWithIncrementedRetryHeader(): void
@@ -105,7 +106,7 @@ final class RetryTransportTest extends TestCase
 
         $request = $storage->pop();
         self::assertEquals(0, $storage->count());
-        self::assertEquals(2, (int)$request->getHeaderLine('x-retry'));
+        self::assertEquals(2, (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER));
     }
 
     public function testShouldTryTransportAllMessagesEvenWhenServiceIsStillDown(): void
@@ -133,6 +134,6 @@ final class RetryTransportTest extends TestCase
 
         $request = $storage->pop();
         self::assertEquals(9, $storage->count());
-        self::assertEquals(2, (int)$request->getHeaderLine('x-retry'));
+        self::assertEquals(2, (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER));
     }
 }

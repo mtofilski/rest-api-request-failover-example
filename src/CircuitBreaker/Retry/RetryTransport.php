@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 final class RetryTransport
 {
+
     private FailedTransport $failedTransport;
     private ClientInterface $client;
 
@@ -27,8 +28,8 @@ final class RetryTransport
             for ($i = 0; $i < $requestsToTransport; $i++) {
                 $request = $this->failedTransport->pop();
                 if ($request) {
-                    $currentRetryCounter = 1 + (int)$request->getHeaderLine('x-retry');
-                    $this->client->send($request->withHeader('x-retry', $currentRetryCounter));
+                    $currentRetryCounter = 1 + (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER);
+                    $this->client->send($request->withHeader(FailedTransport::RETRY_HEADER, $currentRetryCounter));
                 }
             }
         } catch (GuzzleException | RejectedException $e) {
@@ -44,9 +45,9 @@ final class RetryTransport
             for ($i = 0; $i < $requestsToTransport; $i++) {
                 $request = $this->failedTransport->pop();
                 if ($request) {
-                    $currentRetryCounter = 1 + (int)$request->getHeaderLine('x-retry');
+                    $currentRetryCounter = 1 + (int)$request->getHeaderLine(FailedTransport::RETRY_HEADER);
                     try {
-                        $this->client->send($request->withHeader('x-retry', $currentRetryCounter));
+                        $this->client->send($request->withHeader(FailedTransport::RETRY_HEADER, $currentRetryCounter));
                     } catch (GuzzleException | RejectedException $e) {
                         continue;
                     }
