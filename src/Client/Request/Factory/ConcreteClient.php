@@ -38,7 +38,7 @@ final class ConcreteClient
         $handleStack->push(CircuitBreakerMiddleware::circuitBreaker($ganesha));
         return new Client(
             [
-                'base_uri' => 'https://localhost:8000',
+                'base_uri' => $_ENV['SERVER_URI'],
                 'verify'   => false,
                 'handler'  => $handleStack
             ]
