@@ -1,4 +1,4 @@
-#rest-api-request-failover-example
+# rest-api-request-failover-example
 
 Simple client-server example how to handle failure connection between services via REST API.
 
@@ -9,7 +9,7 @@ FailedTransportMiddleware - store request when service response is incorrect. We
 
 FailureDetectionMiddleware - circuit breaker pattern, see https://github.com/ackintosh/ganesha
 
-##Run
+## Run
 
 Start server
 ```
